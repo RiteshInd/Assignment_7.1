@@ -1,0 +1,82 @@
+1. Use the given link Data Set:https://archive.ics.uci.edu/ml/datasets/Yeast
+Answer the below questions:
+a. Find out top 5 attributes having highest correlation (select only Numeric features).
+
+COBRA_YTD2017<-read.csv('D:/R/COBRA-YTD2017.csv') 
+require(Amelia)
+library(Rcpp) 
+data<-COBRA_YTD2017 
+data[4:10,3] <- rep(NA,7) 
+data[1:5,4] <- NA 
+data <- data[-c(5,6)] 
+summary(data)
+str(COBRA_YTD2017)
+library(car)
+
+fit<-lm(beat~MinOfucr+ MaxOfnum_victims+loc_type+neighborhood+x+y,data =COBRA_YTD2017)
+fit
+summary(fit)
+vif(fit)
+vif(fit)>5
+
+fi<-lm(MinOfucr~beat+ MaxOfnum_victims+loc_type+neighborhood+x+y,data =COBRA_YTD2017)
+fi
+summary(fi)
+vif(fi)>5
+
+Note: 
+1 P-values are very important because, we can consider linear model to be statistically significant only.
+2 When both these p-values are less that the pre-determined statistical determined level, which is ideally 0.05.
+3 This is visually interpreted by the significance stars at the end of the row.
+4 The more stars beside the variable’s p-value, the more significant the variable.
+
+When there is a p-value, there is a null and alternative hypothesis associated with it.
+Null and Alternate Hypothesis
+1 In Linear regression, the Null Hypothesis is that the coefficients associated with the variables is equal to zero.
+2 The alternate hypothesis is that the coefficients are not equal to zero.
+3 There exists a relationship between the independent variable in question and the dependent variable.
+
+
+b. Find out top 3 reasons for having more crime in a city.
+
+
+at$dayofWeek <- weekdays(as.Date(at$occur_date))
+at$hour <- sub(":.*", "", at$occur_time)
+at$hour <- as.numeric(at$hour)
+ggplot(aes(x = hour), data = at) + geom_histogram(bins = 24, color='white', fill='black') +
+  ggtitle('Histogram of Crime Time') 
+
+#The crime time distribution appears bimodal with peaking around midnight and again at the noon, then again between 6pm and 8pm.  
+
+#topCrimes_1 <- topCrimes %>% group_by(`UC2 Literal`,occur_time) %>% 
+  #summarise(total = n())
+#ggplot(aes(x = occur_time, y = total), data = topCrimes_1) +
+  #geom_point(colour="blue", size=1) +
+  #geom_smooth(method="loess") +
+  #xlab('Hour(24 hour clock)') +
+ # ylab('Number of Crimes') +
+  #ggtitle('Top Crimes Time of the Day') +
+  #facet_wrap(~`UC2 Literal`)
+
+#Downtown and midtown are the most common locations where crimes take place, followed by Old Fourth Ward and West End. larceny theft are the top crimes in Atlanta followed by aggravated assault
+
+
+c. Which all attributes have correlation with crime rate?
+
+
+kable(count(COBRA_YTD2017, loc_type, sort=TRUE), "html", col.names=c("Crime Type", "Frequency")) %>%
+kable_styling(bootstrap_options="striped", full_width=FALSE)
+COBRA_YTD2017 %>%
+  group_by(days, loc_type) %>%
+  summarize(freq=n()) %>%
+  ggplot(aes(reorder(days, -freq), freq)) +   
+  geom_bar(aes(fill=loc_type), position="dodge", stat="identity", width=0.8, color="black") +
+  xlab("Day of Week") +
+  ylab("Frequency") +
+  labs(fill="Crime Type") +
+  ggtitle("Crime by Day of the Week")
+kable
+
+#The data provides crime type frequency and crime by day of the week.
+#Among the high crime categories, larceny tend to increase on Fridays and Saturdays. while burglary residence generally occurred more often during the weekdays than the weekends. Auto theft were least reported on Thursdays and increase for the weekends.
+
